@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"slices"
 )
 
 type Marker struct {
@@ -21,57 +20,72 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	findMarkers(data)
+	markers := findMarkers(data)
+	for i := range markers {
+		fmt.Println(markers[i].name)
+	}
 }
 
 // Find the "("
-func findMarkers(data []byte) {
-	//markers := make([]Marker, 2000)
+func findMarkers(data []byte) []Marker {
+	count := countMarkers(data)
+	markers := make([]Marker, count)
+	count = 0
 	for i := range data {
 		if data[i] == '(' {
+			count++
 			var marker Marker
 			j := i
 			for data[j] != ')' {
 				j++
 			}
-			name := data[i+1 : j]
-			var value byte
+			name := string(data[i+1 : j])
+			var value string
 			if isAValue(name) {
 				name, value = splitValue(name)
 
 			}
+			marker.start = i
+			marker.end = j
 			marker.name = string(name)
 			marker.value = string(value)
-			fmt.Println("Nouveau marker")
-			fmt.Print(marker.start)
-			fmt.Print(marker.end)
-			fmt.Print(marker.name)
-			fmt.Print(marker.value)
-			fmt.Println()
+			markers[count-1] = marker
 		}
 	}
+	return markers
 }
 
-// Est ce qu'il y a une value, en gros est ce qu'il ya une virgule
-func splitValue(name []byte) ([]byte, byte) {
+// Est ce qu'il y a une value, en gros est ce qu'il y a une virgule
+func splitValue(name string) (string, string) {
 	var k int
 	var j int
-	if isAValue(name) {
-		for i := range name {
-			if name[i] == ',' {
-				k = i
-				j = i
-				for name[j] <= '0' || name[j] >= '9' {
-					j++
-				}
+	for i := range name {
+		if name[i] == ',' {
+			k = i
+			j = i
+			for name[j] <= '0' || name[j] >= '9' {
+				j++
 			}
 		}
-		return name[0:k], name[j]
-	} else {
-		return name, name[j]
 	}
+	return name[0:k], string(name[j])
 }
 
-func isAValue(name []byte) bool {
-	return slices.Contains(name, ',')
+func isAValue(name string) bool {
+	for _, c := range name {
+		if c == ',' {
+			return true
+		}
+	}
+	return false
+}
+
+func countMarkers(data []byte) int {
+	count := 0
+	for i := range data {
+		if data[i] == '(' {
+			count++
+		}
+	}
+	return count
 }
