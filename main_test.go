@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestCountMarkers(t *testing.T) {
+func Test_countMarkers(t *testing.T) {
 	fsys := os.DirFS(".")
 	data, err := fs.ReadFile(fsys, "test.txt")
 	if err != nil {
@@ -21,7 +21,7 @@ func TestCountMarkers(t *testing.T) {
 	}
 }
 
-func TestSplitOptionAndValueFromMarker(t *testing.T) {
+func Test_splitOptionAndValueFromMarker(t *testing.T) {
 	tests := []struct {
 		name       string
 		input      string
@@ -46,7 +46,7 @@ func TestSplitOptionAndValueFromMarker(t *testing.T) {
 
 }
 
-func TestIsLower(t *testing.T) {
+func Test_isLower(t *testing.T) {
 	tests := []struct {
 		name  string
 		input byte
@@ -65,7 +65,7 @@ func TestIsLower(t *testing.T) {
 	}
 }
 
-func TestFindWords(t *testing.T) {
+func Test_findWords(t *testing.T) {
 	tests := []struct {
 		name  string
 		input []byte
@@ -77,7 +77,7 @@ func TestFindWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := findWords(tt.input, findMarkers(readFile())[2])
-			if slices.Equal(got, tt.want) {
+			if !slices.Equal(got, tt.want) {
 				t.Errorf("findWords(%q) = %q, want = %q", tt.input, got, tt.want)
 			}
 		})
