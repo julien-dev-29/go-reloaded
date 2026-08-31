@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"slices"
 	"testing"
 )
 
@@ -25,10 +26,10 @@ func TestSplitOptionAndValueFromMarker(t *testing.T) {
 		name       string
 		input      string
 		wantOption string
-		wantValue  string
+		wantValue  int
 	}{
-		{"valid input", "cap, 8", "cap", "8"},
-		{"another input", "foo, 3", "foo", "3"},
+		{"valid input", "cap, 8", "cap", 8},
+		{"another input", "foo, 3", "foo", 3},
 	}
 
 	for _, tt := range tests {
@@ -48,7 +49,7 @@ func TestSplitOptionAndValueFromMarker(t *testing.T) {
 func TestIsLower(t *testing.T) {
 	tests := []struct {
 		name  string
-		input rune
+		input byte
 		want  bool
 	}{
 		{"lowercase letter", 'c', true},
@@ -64,23 +65,39 @@ func TestIsLower(t *testing.T) {
 	}
 }
 
-func TestCapitalize(t *testing.T) {
+func TestFindWords(t *testing.T) {
 	tests := []struct {
 		name  string
-		input string
-		want  string
+		input []byte
+		want  []byte
 	}{
-		{"String with only lower characters", "yolo", "Yolo"},
-		{"String with lower and upper characters", "yoPo66", "Yopo66"},
+		{"String with one word", readFile(), []byte("it was the age of foolishness")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := capitalize(tt.input)
-			if got != tt.want {
-				t.Errorf("capitalize(%q) = %q, want = %q", tt.input, got, tt.want)
+			got := findWords(tt.input, findMarkers(readFile())[2])
+			if slices.Equal(got, tt.want) {
+				t.Errorf("findWords(%q) = %q, want = %q", tt.input, got, tt.want)
 			}
 		})
 	}
+}
 
+func Test_findStartOfWord(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []byte
+		want  int
+	}{
+		{"Trouver l'index de début d'un mot dans une phrase", readFile()[100:120], 9},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := findStartOfWord(tt.input)
+			if got != tt.want {
+				t.Errorf("findWords(%q) = %d, want = %d", tt.input, got, tt.want)
+			}
+		})
+	}
 }
