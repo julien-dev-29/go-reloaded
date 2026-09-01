@@ -21,17 +21,22 @@ type Word struct {
 
 func main() {
 	data := readFile()
+	fmt.Println(string(data))
 	markers := findMarkers(data)
 	for _, marker := range markers {
 		name := marker.option
 		switch name {
 		case "cap":
 			Capitalize(findWords(data, marker))
-			fmt.Println(string(data))
+		case "up":
+			ToUppercase(findWords(data, marker))
+		case "low":
+			ToLowercase(findWords(data, marker))
 		default:
 
 		}
 	}
+	fmt.Println(string(data))
 }
 
 func readFile() []byte {
@@ -115,7 +120,6 @@ func isALetter(r rune) bool {
 func findWords(data []byte, marker Marker) []byte {
 	splitFirstSpace := 1
 	index := marker.position
-	fmt.Println(marker.value)
 	for i := 0; i < marker.value; i++ {
 		index = findStartOfWord(data[:index-splitFirstSpace])
 	}
