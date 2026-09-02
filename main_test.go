@@ -71,12 +71,12 @@ func Test_findWords(t *testing.T) {
 		input []byte
 		want  []byte
 	}{
-		{"String with one word", readFile(), []byte("it was the age of foolishness")},
+		{"String with one word", readFile("test.txt"), []byte("it was the age of foolishness")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := findWords(tt.input, findMarkers(readFile())[2])
+			got := findWords(tt.input, findMarkers(readFile("test.txt"))[2])
 			if !slices.Equal(got, tt.want) {
 				t.Errorf("findWords(%q) = %q, want = %q", tt.input, got, tt.want)
 			}
@@ -90,7 +90,7 @@ func Test_findStartOfWord(t *testing.T) {
 		input []byte
 		want  int
 	}{
-		{"Trouver l'index de début d'un mot dans une phrase", readFile()[100:120], 9},
+		{"Trouver l'index de début d'un mot dans une phrase", readFile("test.txt")[100:120], 9},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

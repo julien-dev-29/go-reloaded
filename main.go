@@ -20,18 +20,20 @@ type Word struct {
 }
 
 func main() {
-	data := readFile()
+	data := readFile("hex.txt")
 	fmt.Println(string(data))
 	markers := findMarkers(data)
 	for _, marker := range markers {
 		name := marker.option
 		switch name {
 		case "cap":
-			Capitalize(findWords(data, marker))
+			Capitalize(data[findWordsStart(data, marker) : marker.position-1])
 		case "up":
-			ToUppercase(findWords(data, marker))
+			ToUppercase(data[findWordsStart(data, marker) : marker.position-1])
 		case "low":
-			ToLowercase(findWords(data, marker))
+			ToLowercase(data[findWordsStart(data, marker) : marker.position-1])
+		case "hex":
+			//slices.Grow()()(data[findWordsStart(data, marker) : marker.position-1])
 		default:
 
 		}
@@ -39,9 +41,9 @@ func main() {
 	fmt.Println(string(data))
 }
 
-func readFile() []byte {
+func readFile(filename string) []byte {
 	fsys := os.DirFS(".")
-	data, err := fs.ReadFile(fsys, "test.txt")
+	data, err := fs.ReadFile(fsys, filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -117,13 +119,13 @@ func isALetter(r rune) bool {
 	return false
 }
 
-func findWords(data []byte, marker Marker) []byte {
+func findWordsStart(data []byte, marker Marker) int {
 	splitFirstSpace := 1
 	index := marker.position
 	for i := 0; i < marker.value; i++ {
 		index = findStartOfWord(data[:index-splitFirstSpace])
 	}
-	return data[index : marker.position-splitFirstSpace]
+	return index
 }
 
 func findStartOfWord(data []byte) int {
