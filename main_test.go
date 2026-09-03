@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"slices"
 	"testing"
 )
 
@@ -43,7 +42,6 @@ func Test_splitOptionAndValueFromMarker(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func Test_isLower(t *testing.T) {
@@ -65,39 +63,45 @@ func Test_isLower(t *testing.T) {
 	}
 }
 
-func Test_findWords(t *testing.T) {
+func Test_getWordsToFormatIndex(t *testing.T) {
+	data := readFile("test.txt")
+	markers := findMarkers(data)
 	tests := []struct {
-		name  string
-		input []byte
-		want  []byte
+		name   string
+		data   []byte
+		marker Marker
+		want   int
 	}{
-		{"String with one word", readFile("test.txt"), []byte("it was the age of foolishness")},
+		{"String with test.txt and marker 1", data, markers[0], 0},
+		{"String with test.txt and marker 2", data, markers[1], 52},
+		{"String with test.txt and marker 3", data, markers[2], 91},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := findWords(tt.input, findMarkers(readFile("test.txt"))[2])
-			if !slices.Equal(got, tt.want) {
-				t.Errorf("findWords(%q) = %q, want = %q", tt.input, got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_findStartOfWord(t *testing.T) {
-	tests := []struct {
-		name  string
-		input []byte
-		want  int
-	}{
-		{"Trouver l'index de début d'un mot dans une phrase", readFile("test.txt")[100:120], 9},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := findStartOfWord(tt.input)
+			got := getWordsToFormatIndex(tt.data, tt.marker)
 			if got != tt.want {
-				t.Errorf("findWords(%q) = %d, want = %d", tt.input, got, tt.want)
+				t.Errorf("findWords(%q, %q) = %v, want = %v", tt.data, tt.marker, got, tt.want)
 			}
 		})
 	}
 }
+
+// func Test_process(t *testing.T) {
+// 	tests := []struct {
+// 		name    string
+// 		data    []byte
+// 		markers []Marker
+// 		want    []byte
+// 	}{
+// 		{"Test with test.txt and marker 1", readFile("test.txt"), findMarkers(readFile("test.txt")), []byte("It")},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			got := process(tt.data, tt.markers)
+// 			if !slices.Equal(got, tt.want) {
+// 				t.Errorf("process() = %v, want %v", string(got), string(tt.want))
+// 			}
+// 		})
+// 	}
+// }

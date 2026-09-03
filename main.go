@@ -9,9 +9,10 @@ import (
 )
 
 type Marker struct {
-	position int
-	option   string
-	value    int
+	startIndex int
+	endIndex   int
+	option     string
+	value      int
 }
 
 type Word struct {
@@ -20,25 +21,33 @@ type Word struct {
 }
 
 func main() {
-	data := readFile("hex.txt")
+	data := readFile("test.txt")
 	fmt.Println(string(data))
 	markers := findMarkers(data)
+	result := process(data, markers)
+	fmt.Println(string(result))
+}
+
+func process(data []byte, markers []Marker) []byte {
+	var result []byte
 	for _, marker := range markers {
 		name := marker.option
 		switch name {
 		case "cap":
-			Capitalize(data[findWordsStart(data, marker) : marker.position-1])
+			wordsSlice := data[getWordsToFormatIndex(data, marker) : marker.startIndex-1]
+			capWordsSlices := Capitalize(wordsSlice)
+			fmt.Println(string(capWordsSlices))
 		case "up":
-			ToUppercase(data[findWordsStart(data, marker) : marker.position-1])
+			//result = ToUppercase(data[findWordsStart(data, marker) : marker.position-1])
 		case "low":
-			ToLowercase(data[findWordsStart(data, marker) : marker.position-1])
+			//result = ToLowercase(data[findWordsStart(data, marker) : marker.position-1])
 		case "hex":
 			//slices.Grow()()(data[findWordsStart(data, marker) : marker.position-1])
 		default:
 
 		}
 	}
-	fmt.Println(string(data))
+	return result
 }
 
 func readFile(filename string) []byte {
@@ -58,11 +67,12 @@ func findMarkers(data []byte) []Marker {
 	for i := range data {
 		if data[i] == '(' {
 			var marker Marker
-			marker.position = i
+			marker.startIndex = i
 			j := i
 			for data[j] != ')' {
 				j++
 			}
+			marker.endIndex = j
 			bracketIndex := 1
 			markerContent := string(data[i+bracketIndex : j])
 			if isMarkerGotValue(markerContent) {
@@ -119,22 +129,20 @@ func isALetter(r rune) bool {
 	return false
 }
 
-func findWordsStart(data []byte, marker Marker) int {
-	splitFirstSpace := 1
-	index := marker.position
-	for i := 0; i < marker.value; i++ {
-		index = findStartOfWord(data[:index-splitFirstSpace])
-	}
-	return index
-}
-
-func findStartOfWord(data []byte) int {
-	result := 0
-	for i := len(data) - 1; i >= 0; i-- {
-		if data[i] == ' ' {
-			result = i + 1
-			break
+func getWordsToFormatIndex(data []byte, marker Marker) int {
+	fmt.Println(marker)
+	i := 0
+	startIndex := marker.startIndex - 2
+	count := 0
+	for count != marker.value {
+		i++
+		if startIndex-i == 0 {
+			return 0
+		}
+		if data[startIndex-i] == ' ' {
+			count++
 		}
 	}
-	return result
+	i--
+	return startIndex - i
 }

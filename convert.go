@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 )
@@ -14,7 +13,6 @@ func ConvertHex2Dec(dec int, count int, result float64) float64 {
 }
 
 func Hex2Dec(data []byte) ([]byte, error) {
-	fmt.Println(data)
 	decimal, err := strconv.ParseInt(string(data), 16, 64)
 	if err != nil {
 		return nil, err
@@ -23,7 +21,6 @@ func Hex2Dec(data []byte) ([]byte, error) {
 	decimalStr := strconv.FormatInt(decimal, 10)
 
 	data = []byte(decimalStr)
-	fmt.Println(data)
 	return data, nil
 }
 
