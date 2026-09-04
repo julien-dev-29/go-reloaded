@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -21,33 +20,16 @@ type Word struct {
 }
 
 func main() {
+	mylog := log.New(os.Stdout, "jurol:", log.LstdFlags)
+	mylog.SetFlags(log.Lmicroseconds)
 	data := readFile("test.txt")
-	fmt.Println(string(data))
-	markers := findMarkers(data)
-	result := process(data, markers)
-	fmt.Println(string(result))
-}
-
-func process(data []byte, markers []Marker) []byte {
-	var result []byte
-	for _, marker := range markers {
-		name := marker.option
-		switch name {
-		case "cap":
-			wordsSlice := data[getWordsToFormatIndex(data, marker) : marker.startIndex-1]
-			capWordsSlices := Capitalize(wordsSlice)
-			fmt.Println(string(capWordsSlices))
-		case "up":
-			//result = ToUppercase(data[findWordsStart(data, marker) : marker.position-1])
-		case "low":
-			//result = ToLowercase(data[findWordsStart(data, marker) : marker.position-1])
-		case "hex":
-			//slices.Grow()()(data[findWordsStart(data, marker) : marker.position-1])
-		default:
-
+	for i, b := range data {
+		mylog.Println("Byte", i, ":", string(b))
+		if b == '(' {
+			j := i
+			mylog.Println("----------------------->", string(b))
 		}
 	}
-	return result
 }
 
 func readFile(filename string) []byte {
@@ -57,35 +39,6 @@ func readFile(filename string) []byte {
 		log.Fatal(err)
 	}
 	return data
-}
-
-// Find the "("
-func findMarkers(data []byte) []Marker {
-	count := countMarkers(data)
-	markers := make([]Marker, count)
-	markerIndex := 0
-	for i := range data {
-		if data[i] == '(' {
-			var marker Marker
-			marker.startIndex = i
-			j := i
-			for data[j] != ')' {
-				j++
-			}
-			marker.endIndex = j
-			bracketIndex := 1
-			markerContent := string(data[i+bracketIndex : j])
-			if isMarkerGotValue(markerContent) {
-				marker.option, marker.value = splitOptionAndValueFromMarker(markerContent)
-			} else {
-				marker.option = markerContent
-				marker.value = 1
-			}
-			markers[markerIndex] = marker
-			markerIndex++
-		}
-	}
-	return markers
 }
 
 func splitOptionAndValueFromMarker(name string) (string, int) {
@@ -103,23 +56,13 @@ func splitOptionAndValueFromMarker(name string) (string, int) {
 }
 
 // Est ce qu'il y a une value, en gros est ce qu'il y a une virgule
-func isMarkerGotValue(name string) bool {
+func isMarkerGotValue(name []byte) bool {
 	for _, c := range name {
 		if c == ',' {
 			return true
 		}
 	}
 	return false
-}
-
-func countMarkers(data []byte) int {
-	count := 0
-	for i := range data {
-		if data[i] == '(' {
-			count++
-		}
-	}
-	return count
 }
 
 func isALetter(r rune) bool {
@@ -130,11 +73,10 @@ func isALetter(r rune) bool {
 }
 
 func getWordsToFormatIndex(data []byte, marker Marker) int {
-	fmt.Println(marker)
 	i := 0
 	startIndex := marker.startIndex - 2
 	count := 0
-	for count != marker.value {
+	for count < marker.value {
 		i++
 		if startIndex-i == 0 {
 			return 0
