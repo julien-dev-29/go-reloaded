@@ -111,7 +111,7 @@ func fixArticle(tokens []string) []string {
 		}
 		switch tokens[i-1] {
 		case "a":
-			if isStartWithVowel(tok) {
+			if isStartWithVowel(tok) || tok[0] == 'h' {
 				out = out[:len(tokens)-2]
 				out = append(out, "an")
 				out = append(out, tok)
@@ -120,7 +120,7 @@ func fixArticle(tokens []string) []string {
 			}
 
 		case "A":
-			if isStartWithVowel(tok) {
+			if isStartWithVowel(tok) || tok[0] == 'h' {
 				out = out[:len(tokens)-2]
 				out = append(out, "An")
 				out = append(out, tok)

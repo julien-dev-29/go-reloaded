@@ -169,6 +169,7 @@ func Test_fixArticle(t *testing.T) {
 	}{
 		{"lowercase article with vowel", []string{"bearing", "a", "untold"}, []string{"bearing", "an", "untold"}},
 		{"lowercase article without vowel", []string{"bearing", "a", "told"}, []string{"bearing", "a", "told"}},
+		{"lowercase article with 'h'", []string{"bearing", "a", "hold"}, []string{"bearing", "an", "hold"}},
 		{"uppercase article with vowel", []string{"bearing", "A", "untold"}, []string{"bearing", "An", "untold"}},
 		{"uppercase article without vowel", []string{"bearing", "A", "told"}, []string{"bearing", "A", "told"}},
 	}
