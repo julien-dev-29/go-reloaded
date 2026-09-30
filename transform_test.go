@@ -244,3 +244,95 @@ func Test_isVowel(t *testing.T) {
 		})
 	}
 }
+
+func Test_separatePunctuation(t *testing.T) {
+	tests := []struct {
+		name string
+		in   []string
+		want []string
+	}{
+		{"basic", []string{"Punctuation", "tests", "are", "...", "kinda", "boring", ",what do you think", "?"},
+			[]string{"Punctuation", "tests", "are...", "kinda", "boring,", "what", "do", "you", "think?"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := separatePunctuation(tt.in)
+
+			if !slices.Equal(got, tt.want) {
+				t.Errorf("got %s want %s", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_startWithComma(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want bool
+	}{
+		{"basic", ",what", true},
+		{"invalid", "what", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := startWithComma(tt.in)
+
+			if got != tt.want {
+				t.Errorf("got %t want %t", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_addComma(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"basic", "yolo", "yolo,"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := addComma(tt.in)
+
+			if got != tt.want {
+				t.Errorf("got %s want %s", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_deleteComma(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"basic", ",yolo", "yolo"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := deleteComma(tt.in)
+
+			if got != tt.want {
+				t.Errorf("got %s want %s", got, tt.want)
+			}
+		})
+	}
+}
+
+// func Test_assemble(t *testing.T) {
+// 	tests := []struct {
+// 		name string
+// 		in   []string
+// 		want string
+// 	}{
+// 		{"basic", []string{"yolo", "les", "kikis"}, "yolo les kikis"},
+// 	}
+// }

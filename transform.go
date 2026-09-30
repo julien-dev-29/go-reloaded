@@ -141,3 +141,37 @@ func isStartWithVowel(token string) bool {
 func isVowel(r rune) bool {
 	return r == 'a' || r == 'e' || r == 'i' || r == 'o' || r == 'u' || r == 'y' || r == 'A' || r == 'E' || r == 'I' || r == 'O' || r == 'U' || r == 'Y'
 }
+
+func fixPunctuation(tokens []string) []string {
+	out := make([]string, 0, len(tokens))
+	for _, tok := range tokens {
+		out = append(out, tok)
+	}
+	return out
+}
+
+func separatePunctuation(tokens []string) []string {
+	out := make([]string, 0, len(tokens))
+
+	for i, tok := range tokens {
+		if startWithComma(tok) {
+			out[i-1] = addComma(out[i-1])
+			out = append(out, deleteComma(tok))
+		} else {
+			out = append(out, tok)
+		}
+	}
+	return out
+}
+
+func startWithComma(tok string) bool {
+	return tok[0] == ','
+}
+
+func addComma(tok string) string {
+	return tok + ","
+}
+
+func deleteComma(tok string) string {
+	return tok[1:]
+}
