@@ -103,75 +103,29 @@ func parseMarker(s string) (string, int) {
 }
 
 func fixArticle(tokens []string) []string {
-	out := make([]string, 0, len(tokens))
-	for i, tok := range tokens {
-		if len(out) == 0 {
-			out = append(out, tok)
-			continue
-		}
-		switch tokens[i-1] {
-		case "a":
-			if isStartWithVowel(tok) || tok[0] == 'h' {
-				out = out[:len(tokens)-2]
-				out = append(out, "an")
-				out = append(out, tok)
-			} else {
-				out = append(out, tok)
+	out := append([]string{}, tokens...)
+	for i, tok := range out {
+		if isStartWithVowelOrH(tok) {
+			switch out[i-1] {
+			case "a":
+				out[i-1] = "an"
+			case "A":
+				out[i-1] = "An"
 			}
-
-		case "A":
-			if isStartWithVowel(tok) || tok[0] == 'h' {
-				out = out[:len(tokens)-2]
-				out = append(out, "An")
-				out = append(out, tok)
-			} else {
-				out = append(out, tok)
-			}
-		default:
-			out = append(out, tok)
 		}
 	}
 	return out
 }
 
-func isStartWithVowel(token string) bool {
-	return isVowel(rune(token[0]))
-}
-
-func isVowel(r rune) bool {
-	return r == 'a' || r == 'e' || r == 'i' || r == 'o' || r == 'u' || r == 'y' || r == 'A' || r == 'E' || r == 'I' || r == 'O' || r == 'U' || r == 'Y'
-}
-
-func fixPunctuation(tokens []string) []string {
-	out := make([]string, 0, len(tokens))
-	for _, tok := range tokens {
-		out = append(out, tok)
+func isStartWithVowelOrH(token string) bool {
+	if token == "" {
+		return false
 	}
-	return out
-}
-
-func separatePunctuation(tokens []string) []string {
-	out := make([]string, 0, len(tokens))
-
-	for i, tok := range tokens {
-		if startWithComma(tok) {
-			out[i-1] = addComma(out[i-1])
-			out = append(out, deleteComma(tok))
-		} else {
-			out = append(out, tok)
-		}
+	switch token[0] {
+	case 'a', 'e', 'i', 'o', 'u', 'y', 'h', 'A', 'E', 'I', 'O', 'U', 'Y', 'H':
+		return true
 	}
-	return out
+	return false
 }
 
-func startWithComma(tok string) bool {
-	return tok[0] == ','
-}
 
-func addComma(tok string) string {
-	return tok + ","
-}
-
-func deleteComma(tok string) string {
-	return tok[1:]
-}
