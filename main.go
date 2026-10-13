@@ -7,22 +7,29 @@ import (
 )
 
 func main() {
+	
+	if len(os.Args) == 1 {
+		fmt.Println("Must provide the path of file")
+		return
+	}
 
 	if len(os.Args) > 2 {
 		fmt.Println("Too much arguments")
 		return
 	}
+
 	path := os.Args[1]
-	data, err := os.ReadFile(path)
+	data, err := readFile(path)
+
 	if err != nil {
-		fmt.Println("Erreur pendant la lecture du fichier")
+		fmt.Println(err)
 		return
 	}
+
 	fmt.Println(string(data))
-	formatText := normalizeMarkers(string(data))
-	fmt.Println(formatText)
-	words := strings.FieldsSeq(formatText)
-	for word := range words{
-		fmt.Println(word)
-	}
+	normalizedText := normalizeMarkers(string(data))
+	formatText := convertMarkers(strings.Fields(normalizedText))
+	formatText = applyCase(formatText)
+	formatText = separatePunctuation(formatText)
+	fmt.Println(strings.Join(formatText, "|"))
 }

@@ -17,6 +17,11 @@ func Test_separatePunctuation(t *testing.T) {
 			[]string{"there", ",", "and", "then"},
 		},
 		{
+			"leading punctuation",
+			[]string{"there,", "and", "then"},
+			[]string{"there", ",", "and", "then"},
+		},
+		{
 			"punct group",
 			[]string{"are", "...", "kinda"},
 			[]string{"are", "...", "kinda"},
