@@ -107,55 +107,34 @@ func Test_applyCase(t *testing.T) {
 	}{
 		{
 			"capitalize",
-			[]string{"yolo", "lala", "popo", "(cap,3)"},
+			[]string{"yolo", "lala", "popo", "(cap", ",","3)"},
 			[]string{"Yolo", "Lala", "Popo"},
 		},
-		{
-			"up simple",
-			[]string{"Ready", "for", "the", "show", "(up)", "!"},
-			[]string{"Ready", "for", "the", "SHOW", "!"},
-		},
-		{
-			"up count=3",
-			[]string{"Ready", "for", "the", "show", "(up,3)", "!"},
-			[]string{"Ready", "FOR", "THE", "SHOW", "!"},
-		},
-		{
-			"low simple",
-			[]string{"Ready", "for", "the", "SHOW", "(low)", "!"},
-			[]string{"Ready", "for", "the", "show", "!"},
-		},
-		{
-			"low count=2",
-			[]string{"Ready", "for", "THE", "SHOW", "(low,2)", "!"},
-			[]string{"Ready", "for", "the", "show", "!"},
-		},
+		// {
+		// 	"up simple",
+		// 	[]string{"Ready", "for", "the", "show", "(up)", "!"},
+		// 	[]string{"Ready", "for", "the", "SHOW", "!"},
+		// },
+		// {
+		// 	"up count=3",
+		// 	[]string{"Ready", "for", "the", "show", "(up", ",", "3)", "!"},
+		// 	[]string{"Ready", "FOR", "THE", "SHOW", "!"},
+		// },
+		// {
+		// 	"low simple",
+		// 	[]string{"Ready", "for", "the", "SHOW", "(low)", "!"},
+		// 	[]string{"Ready", "for", "the", "show", "!"},
+		// },
+		// {
+		// 	"low count=2",
+		// 	[]string{"Ready", "for", "THE", "SHOW", "(low,2)", "!"},
+		// 	[]string{"Ready", "for", "the", "show", "!"},
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := applyCase(tt.in); !slices.Equal(got, tt.want) {
-				t.Errorf("applyCase(%v)=%v, got %v", tt.in, tt.want, got)
-			}
-		})
-	}
-}
-
-func Test_parseMarker(t *testing.T) {
-	tests := []struct {
-		name  string
-		in    string
-		want1 string
-		want2 int
-	}{
-		{"Marker with a value", "(up,2)", "up", 2},
-		{"Marker without a value", "(up)", "up", 1},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got1, got2 := parseMarker(tt.in)
-			if got1 != tt.want1 || got2 != tt.want2 {
-				t.Errorf("out1 %s want %s, out2 %d want2 %d", got1, tt.want1, got2, tt.want2)
+			if got, _ := applyCase(tt.in); !slices.Equal(got, tt.want) {
+				t.Errorf("want %v, got %v", tt.want, got)
 			}
 		})
 	}

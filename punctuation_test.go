@@ -32,6 +32,11 @@ func Test_separatePunctuation(t *testing.T) {
 			[]string{"boring", ",", "what", "do"},
 		},
 		{
+			"quote punctuaion",
+			[]string{"boring", "'what", "do"},
+			[]string{"boring", "'", "what", "do"},
+		},
+		{
 			"exclamation suffix untouched",
 			[]string{"BAMM", "!!"},
 			[]string{"BAMM", "!!"},

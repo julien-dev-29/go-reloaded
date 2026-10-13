@@ -56,50 +56,48 @@ func convertMarkers(tokens []string) []string {
 	return out
 }
 
-func applyCase(tokens []string) []string {
+func applyCase(tokens []string) ([]string, error) {
 	out := make([]string, 0, len(tokens))
-	for _, tok := range tokens {
+	for i, tok := range tokens {
 		if len(out) == 0 {
 			out = append(out, tok)
 			continue
 		}
-		option := ""
-		val := 1
-		if []byte(tok)[0] == '(' && []byte(tok)[len(tok)-1] == ')' {
-			option, val = parseMarker(tok)
+		var (
+			option string
+			val    int
+		)
+		if tok[len(tok)-1] == ')' {
+			if tok[0] == '(' {
+				option, val = tok[1:len(tok)-1], 1
+			} else if i >= 2 {
+				convertVal, err := strconv.ParseInt(string(tok[0:len(tok)-1]), 10, 64)
+				if err != nil {
+					continue
+				}
+				option, val = tokens[i-2][1:], int(convertVal)
+			}
 		}
+		fmt.Println(option)
 		switch option {
 		case "low":
 			for i := range val {
-				out[len(out)-1-int(i)] = strings.ToLower(out[len(out)-1-int(i)])
+				out[len(out)-3-int(i)] = strings.ToLower(out[len(out)-3-int(i)])
 			}
 		case "up":
 			for i := range val {
-				out[len(out)-1-int(i)] = strings.ToUpper(out[len(out)-1-int(i)])
+				out[len(out)-3-int(i)] = strings.ToUpper(out[len(out)-3-int(i)])
 			}
 		case "cap":
 			for i := range val {
-				out[len(out)-1-i] = capitalize(out[len(out)-1-i])
+				out[len(out)-3-i] = capitalize(out[len(out)-3-i])
 			}
+
 		default:
 			out = append(out, tok)
 		}
 	}
-	return out
-}
-
-func parseMarker(s string) (string, int) {
-	if !strings.ContainsRune(s, ',') {
-		return string([]byte(s)[1 : len(s)-1]), 1
-	}
-	bytes := []byte(s)[1 : len(s)-1]
-	str := string(bytes)
-	yolo := strings.Split(str, ",")
-	value, err := strconv.ParseInt(yolo[1], 10, 64)
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	return yolo[0], int(value)
+	return out, nil
 }
 
 func fixArticle(tokens []string) []string {
@@ -127,5 +125,3 @@ func isStartWithVowelOrH(token string) bool {
 	}
 	return false
 }
-
-

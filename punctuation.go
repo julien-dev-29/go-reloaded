@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-var punctuations = ",.?;:!"
+var punctuations = ",.?;:!'"
 var suspension = "..."
 
 func separatePunctuation(tokens []string) []string {

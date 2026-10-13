@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 func main() {
-	
+
 	if len(os.Args) == 1 {
 		fmt.Println("Must provide the path of file")
 		return
@@ -27,9 +26,13 @@ func main() {
 	}
 
 	fmt.Println(string(data))
-	normalizedText := normalizeMarkers(string(data))
-	formatText := convertMarkers(strings.Fields(normalizedText))
-	formatText = applyCase(formatText)
-	formatText = separatePunctuation(formatText)
-	fmt.Println(strings.Join(formatText, "|"))
+	// tokenizeText := tokenize(data)
+	// formatText := convertMarkers(tokenizeText)
+	// formatText, err = applyCase(formatText)
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// 	return
+	// }
+	// formatText = separatePunctuation(formatText)
+	// fmt.Println(strings.Join(formatText, "|"))
 }
