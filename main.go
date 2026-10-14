@@ -12,7 +12,7 @@ func main() {
 		return
 	}
 
-	if len(os.Args) > 2 {
+	if len(os.Args) > 3 {
 		fmt.Println("Too much arguments")
 		return
 	}
@@ -25,14 +25,18 @@ func main() {
 		return
 	}
 
-	fmt.Println(string(data))
-	// tokenizeText := tokenize(data)
-	// formatText := convertMarkers(tokenizeText)
-	// formatText, err = applyCase(formatText)
-	// if err != nil {
-	// 	fmt.Println("Error:", err)
-	// 	return
-	// }
-	// formatText = separatePunctuation(formatText)
-	// fmt.Println(strings.Join(formatText, "|"))
+	tokens := tokenize(data)
+
+	fixed, err := fix(tokens)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fixed = separatePunctuation(fixed)
+
+	fixed = fixArticle(fixed)
+
+	fixedStr := assemble(fixed)
+	os.WriteFile(os.Args[2], []byte(fixedStr), 0644)
 }

@@ -54,15 +54,15 @@ func Test_separatePunctuation(t *testing.T) {
 func Test_isPunctChar(t *testing.T) {
 	tests := []struct {
 		name string
-		in   byte
+		in   string
 		want bool
 	}{
-		{".", '.', true},
-		{",", ',', true},
-		{"?", '?', true},
-		{"!", '!', true},
-		{"a", 'a', false},
-		{"¨", '¨', false},
+		{".", ".", true},
+		{",", ",", true},
+		{"?", "?", true},
+		{"!", "!", true},
+		{"a", "a", false},
+		{"¨", "¨", false},
 	}
 
 	for _, tt := range tests {

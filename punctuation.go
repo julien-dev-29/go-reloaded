@@ -4,16 +4,16 @@ import (
 	"strings"
 )
 
-var punctuations = ",.?;:!'"
+var punctuations = "[,.?;:!']"
 var suspension = "..."
 
 func separatePunctuation(tokens []string) []string {
 	out := make([]string, 0, len(tokens))
 	for _, tok := range tokens {
-		if isPunctChar(tok[0]) && len(tok) > 1 && !isGroupPunctChars(tok) {
+		if isPunctChar(string(tok[0])) && len(tok) > 1 && !isGroupPunctChars(tok) {
 			out = append(out, string(tok[0]))
 			out = append(out, tok[1:])
-		} else if isPunctChar(tok[len(tok)-1]) && len(tok) > 1 && !isGroupPunctChars(tok) {
+		} else if isPunctChar(string(tok[len(tok)-1])) && len(tok) > 1 && !isGroupPunctChars(tok) {
 			out = append(out, tok[:len(tok)-1])
 			out = append(out, string(tok[len(tok)-1]))
 		} else {
@@ -23,8 +23,8 @@ func separatePunctuation(tokens []string) []string {
 	return out
 }
 
-func isPunctChar(char byte) bool {
-	return strings.ContainsRune(punctuations, rune(char))
+func isPunctChar(punct string) bool {
+	return strings.Contains(punctuations, punct)
 }
 
 func isGroupPunctChars(tok string) bool {

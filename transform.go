@@ -1,14 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
 )
-
-var markerRegex = regexp.MustCompile(`\(\s*(hex|bin|up|low|cap)\s*(?:,\s*(\d+)\s*)?\)`)
 
 func capitalize(s string) string {
 	if len(s) == 0 {
@@ -19,91 +15,92 @@ func capitalize(s string) string {
 	return string(runes)
 }
 
-func normalizeMarkers(s string) string {
-	return markerRegex.ReplaceAllStringFunc(s, func(m string) string {
-		subs := markerRegex.FindStringSubmatch(m)
-		if subs[2] != "" {
-			return "(" + subs[1] + "," + subs[2] + ")"
-		}
-		return "(" + subs[1] + ")"
-	})
-}
-
-func convertMarkers(tokens []string) []string {
+func fix(tokens []string) ([]string, error) {
 	out := make([]string, 0, len(tokens))
-	for _, tok := range tokens {
-		if len(out) == 0 {
-			out = append(out, tok)
-			continue
-		}
-		switch tok {
+
+	for i := 0; i <= len(tokens)-1; i++ {
+		switch tokens[i] {
+
 		case "(hex)":
 			if val, ok := hex2Dec(out[len(out)-1]); ok {
 				out[len(out)-1] = val
 			} else {
-				out = append(out, tok)
+				out = append(out, tokens[i])
 			}
+
 		case "(bin)":
 			if val, ok := bin2Dec(out[len(out)-1]); ok {
 				out[len(out)-1] = val
 			} else {
-				out = append(out, tok)
+				out = append(out, tokens[i])
 			}
-		default:
-			out = append(out, tok)
-		}
-	}
-	return out
-}
 
-func applyCase(tokens []string) ([]string, error) {
-	out := make([]string, 0, len(tokens))
-	for i, tok := range tokens {
-		if len(out) == 0 {
-			out = append(out, tok)
-			continue
-		}
-		var (
-			option string
-			val    int
-		)
-		if tok[len(tok)-1] == ')' {
-			if tok[0] == '(' {
-				option, val = tok[1:len(tok)-1], 1
-			} else if i >= 2 {
-				convertVal, err := strconv.ParseInt(string(tok[0:len(tok)-1]), 10, 64)
-				if err != nil {
+		case "(low)":
+			out[len(out)-1] = strings.ToLower(out[len(out)-1])
+
+		case "(up)":
+			out[len(out)-1] = strings.ToUpper(out[len(out)-1])
+
+		case "(cap)":
+			out[len(out)-1] = capitalize(out[len(out)-1])
+
+		case "(low,":
+			if i < len(tokens) {
+				num, ctrl := getNum(tokens, i)
+				switch ctrl {
+				case 1:
 					continue
 				}
-				option, val = tokens[i-2][1:], int(convertVal)
-			}
-		}
-		fmt.Println(option)
-		switch option {
-		case "low":
-			for i := range val {
-				out[len(out)-3-int(i)] = strings.ToLower(out[len(out)-3-int(i)])
-			}
-		case "up":
-			for i := range val {
-				out[len(out)-3-int(i)] = strings.ToUpper(out[len(out)-3-int(i)])
-			}
-		case "cap":
-			for i := range val {
-				out[len(out)-3-i] = capitalize(out[len(out)-3-i])
+				for j := range num {
+					out[len(out)-1-j] = strings.ToLower(out[len(out)-1-j])
+				}
+				i++
 			}
 
+		case "(up,":
+			if i < len(tokens) {
+				num, ctrl := getNum(tokens, i)
+				switch ctrl {
+				case 1:
+					continue
+				}
+				for j := range num {
+					out[len(out)-1-j] = strings.ToUpper(out[len(out)-1-j])
+				}
+				i++
+			}
+		case "(cap,":
+			if i < len(tokens) {
+				num, ctrl := getNum(tokens, i)
+				switch ctrl {
+				case 1:
+					continue
+				}
+				for j := range num {
+					out[len(out)-1-j] = capitalize(out[len(out)-1-j])
+				}
+				i++
+			}
 		default:
-			out = append(out, tok)
+			out = append(out, tokens[i])
 		}
 	}
 	return out, nil
 }
 
+func getNum(tokens []string, i int) (int, int) {
+	numStr := tokens[i+1][:len(tokens[i+1])-1]
+	num, err := strconv.Atoi(numStr)
+	if err != nil {
+		return 0, 1
+	}
+	return num, 0
+}
+
 func fixArticle(tokens []string) []string {
 	out := append([]string{}, tokens...)
 	for i, tok := range out {
-		if isStartWithVowelOrH(tok) {
+		if isStartWithVowelOrH(tok) && i-1 > 0 {
 			switch out[i-1] {
 			case "a":
 				out[i-1] = "an"
