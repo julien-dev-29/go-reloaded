@@ -18,25 +18,18 @@ func main() {
 	}
 
 	path := os.Args[1]
+	
 	data, err := readFile(path)
-
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	tokens := tokenize(data)
-
-	fixed, err := fix(tokens)
+	fixedStr, err := process(data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println(err)
 		return
 	}
 
-	fixed = separatePunctuation(fixed)
-
-	fixed = fixArticle(fixed)
-
-	fixedStr := assemble(fixed)
 	os.WriteFile(os.Args[2], []byte(fixedStr), 0644)
 }
