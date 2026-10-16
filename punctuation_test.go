@@ -17,6 +17,11 @@ func Test_separatePunctuation(t *testing.T) {
 			[]string{"there", ",", "and", "then"},
 		},
 		{
+			"punctuation at the end",
+			[]string{"there", "and,", "then"},
+			[]string{"there", "and", ",", "then"},
+		},
+		{
 			"leading punctuation",
 			[]string{"there,", "and", "then"},
 			[]string{"there", ",", "and", "then"},
@@ -35,6 +40,11 @@ func Test_separatePunctuation(t *testing.T) {
 			"quote punctuaion",
 			[]string{"boring", "'what", "do"},
 			[]string{"boring", "'", "what", "do"},
+		},
+		{
+			"quote punctuaion 2",
+			[]string{"boring", "what'", "do"},
+			[]string{"boring", "what", "'", "do"},
 		},
 		{
 			"exclamation suffix untouched",
